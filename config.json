@@ -1,0 +1,23 @@
+{
+  "siteName": "我的博客",
+  "logo": "https://tc.artemisia.icu/file/3RUdVom2.png",
+  "backgroundImage": "https://tc.artemisia.icu/file/background.jpg",
+  "backgroundConfig": {
+    "position": "center",
+    "size": "cover",
+    "repeat": "no-repeat",
+    "blurEffect": false,
+    "blurStrength": 5
+  },
+  "author": {
+    "name": "博客作者",
+    "avatar": "https://tc.artemisia.icu/file/avatar.jpg",
+    "bio": "这是我的个人博客，分享技术文章和生活感悟"
+  },
+  "navigation": [
+    {"name": "首页", "url": "/"},
+    {"name": "GitHub", "url": "https://github.com"},
+    {"name": "知乎", "url": "https://zhihu.com"},
+    {"name": "微博", "url": "https://weibo.com"}
+  ]
+}

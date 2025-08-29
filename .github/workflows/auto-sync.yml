@@ -1,0 +1,42 @@
+name: Auto Sync Local Changes
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  sync-changes:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Get current date
+      id: date
+      run: echo "date=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+
+    - name: Create automated commit
+      run: |
+        # 这里可以添加自动检测文件变化的逻辑
+        # 目前需要手动推送，但可以设置自动提交模板
+        echo "Auto sync triggered at ${{ steps.date.outputs.date }}" > sync-log.txt
+        git add .
+        git status
+        
+        # 只有在有变化时才提交
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "🔁 Auto sync: ${{ steps.date.outputs.date }}"
+          git push
+        fi

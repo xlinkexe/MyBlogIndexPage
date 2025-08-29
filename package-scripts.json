@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "auto-sync": "node auto-sync.js",
+    "auto-sync:start": "start npm run auto-sync",
+    "auto-sync:background": "node auto-sync.js > sync.log 2>&1 &"
+  }
+}
