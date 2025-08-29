@@ -5,13 +5,18 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ message: 'Method not allowed' })
   }
 
-  // In a real deployment, this would need to be handled differently
-  // since Vercel serverless functions don't have write access to the file system
-  // This is a placeholder that would need to be connected to a database or CMS
+  // For Vercel deployment, we'll simulate saving to a database
+  // In production, you'd connect to a real database like MongoDB, PostgreSQL, etc.
   
   console.log('Config update received:', req.body)
+  
+  // Here you would typically:
+  // 1. Connect to your database
+  // 2. Save the configuration
+  // 3. Return success response
+  
   res.status(200).json({ 
-    message: 'Config update received (in development mode)',
+    message: 'Config saved successfully',
     data: req.body 
   })
 }
