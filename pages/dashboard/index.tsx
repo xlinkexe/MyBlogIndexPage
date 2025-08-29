@@ -5,6 +5,13 @@ interface Config {
   siteName: string
   logo: string
   backgroundImage: string
+  backgroundConfig?: {
+    position: string
+    size: string
+    repeat: string
+    blurEffect: boolean
+    blurStrength: number
+  }
   author: {
     name: string
     avatar: string
@@ -24,98 +31,101 @@ export default function Dashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    const checkAuth = localStorage.getItem('isAuthenticated')
-    if (checkAuth === 'true') {
-      setIsAuthenticated(true)
-      loadConfig()
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth')
+        if (response.ok) {
+          setIsAuthenticated(true)
+          loadConfig()
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+      }
     }
+    checkAuth()
   }, [])
 
-  const loadConfig = () => {
-    fetch('/api/config')
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to load config')
-        }
-        return res.json()
-      })
-      .then(setConfig)
-      .catch(error => {
-        console.error('Config load error:', error)
-        // 使用默认配置作为后备
-        setConfig({
-          siteName: '我的博客',
-          logo: '/logo.png',
-          backgroundImage: '/background.jpg',
-          author: {
-            name: '博客作者',
-            avatar: '/avatar.jpg',
-            bio: '这是我的个人博客，分享技术文章和生活感悟'
-          },
-          navigation: [
-            {name: '首页', url: '/'},
-            {name: 'GitHub', url: 'https://github.com'},
-            {name: '知乎', url: 'https://zhihu.com'},
-            {name: '微博', url: 'https://weibo.com'}
-          ]
-        })
-      })
+  const loadConfig = async () => {
+    try {
+      const response = await fetch('/api/config')
+      if (response.ok) {
+        const configData = await response.json()
+        setConfig(configData)
+      }
+    } catch (error) {
+      console.error('Config load failed:', error)
+    }
   }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
     try {
       const response = await fetch('/api/auth', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
       })
       
       if (response.ok) {
         setIsAuthenticated(true)
-        localStorage.setItem('isAuthenticated', 'true')
+        loadConfig()
       } else {
-        alert('用户名或密码错误')
+        alert('登录失败')
       }
     } catch (error) {
-      console.error('登录错误:', error)
-      alert('登录失败，请重试')
+      console.error('Login failed:', error)
+      alert('登录失败')
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth', { method: 'DELETE' })
+      setIsAuthenticated(false)
+      setConfig(null)
+      router.push('/')
+    } catch (error) {
+      console.error('Logout failed:', error)
     }
   }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!config) return
-    
     try {
       const response = await fetch('/api/save-config', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
       })
       
       if (response.ok) {
         alert('配置保存成功')
       } else {
-        alert('保存失败')
+        alert('配置保存失败')
       }
     } catch (error) {
-      console.error('保存配置错误:', error)
-      alert('保存失败')
+      console.error('Save failed:', error)
+      alert('配置保存失败')
     }
   }
 
-  const handleLogout = () => {
-    setIsAuthenticated(false)
-    localStorage.removeItem('isAuthenticated')
-    setUsername('')
-    setPassword('')
+  const handleNavItemChange = (index: number, field: string, value: string) => {
+    if (!config) return
+    const newNav = [...config.navigation]
+    newNav[index] = { ...newNav[index], [field]: value }
+    setConfig({ ...config, navigation: newNav })
+  }
+
+  const handleAddNavItem = () => {
+    if (!config) return
+    const newNav = [...config.navigation, { name: '新链接', url: 'https://' }]
+    setConfig({ ...config, navigation: newNav })
+  }
+
+  const handleRemoveNavItem = (index: number) => {
+    if (!config) return
+    const newNav = config.navigation.filter((_, i) => i !== index)
+    setConfig({ ...config, navigation: newNav })
   }
 
   if (!isAuthenticated) {
@@ -241,8 +251,14 @@ export default function Dashboard() {
             <select
               value={config.backgroundConfig?.position || 'center'}
               onChange={(e) => setConfig({
-                ...config, 
-                backgroundConfig: {...config.backgroundConfig, position: e.target.value}
+                ...config,
+                backgroundConfig: {
+                  position: e.target.value,
+                  size: config.backgroundConfig?.size || 'cover',
+                  repeat: config.backgroundConfig?.repeat || 'no-repeat',
+                  blurEffect: config.backgroundConfig?.blurEffect || false,
+                  blurStrength: config.backgroundConfig?.blurStrength || 5
+                }
               })}
             >
               <option value="left">左对齐</option>
@@ -257,8 +273,14 @@ export default function Dashboard() {
             <select
               value={config.backgroundConfig?.size || 'cover'}
               onChange={(e) => setConfig({
-                ...config, 
-                backgroundConfig: {...config.backgroundConfig, size: e.target.value}
+                ...config,
+                backgroundConfig: {
+                  position: config.backgroundConfig?.position || 'center',
+                  size: e.target.value,
+                  repeat: config.backgroundConfig?.repeat || 'no-repeat',
+                  blurEffect: config.backgroundConfig?.blurEffect || false,
+                  blurStrength: config.backgroundConfig?.blurStrength || 5
+                }
               })}
             >
               <option value="cover">覆盖</option>
@@ -267,18 +289,24 @@ export default function Dashboard() {
             </select>
           </div>
           <div className="form-group">
-            <label>平铺方式:</label>
+            <label>背景重复:</label>
             <select
               value={config.backgroundConfig?.repeat || 'no-repeat'}
               onChange={(e) => setConfig({
-                ...config, 
-                backgroundConfig: {...config.backgroundConfig, repeat: e.target.value}
+                ...config,
+                backgroundConfig: {
+                  position: config.backgroundConfig?.position || 'center',
+                  size: config.backgroundConfig?.size || 'cover',
+                  repeat: e.target.value,
+                  blurEffect: config.backgroundConfig?.blurEffect || false,
+                  blurStrength: config.backgroundConfig?.blurStrength || 5
+                }
               })}
             >
-              <option value="no-repeat">不平铺</option>
-              <option value="repeat">平铺</option>
-              <option value="repeat-x">横向平铺</option>
-              <option value="repeat-y">纵向平铺</option>
+              <option value="no-repeat">不重复</option>
+              <option value="repeat">重复</option>
+              <option value="repeat-x">水平重复</option>
+              <option value="repeat-y">垂直重复</option>
             </select>
           </div>
           <div className="form-group">
@@ -287,40 +315,51 @@ export default function Dashboard() {
                 type="checkbox"
                 checked={config.backgroundConfig?.blurEffect || false}
                 onChange={(e) => setConfig({
-                  ...config, 
-                  backgroundConfig: {...config.backgroundConfig, blurEffect: e.target.checked}
+                  ...config,
+                  backgroundConfig: {
+                    position: config.backgroundConfig?.position || 'center',
+                    size: config.backgroundConfig?.size || 'cover',
+                    repeat: config.backgroundConfig?.repeat || 'no-repeat',
+                    blurEffect: e.target.checked,
+                    blurStrength: config.backgroundConfig?.blurStrength || 5
+                  }
                 })}
               />
-              启用毛玻璃效果
+              启用背景模糊效果
             </label>
           </div>
           {config.backgroundConfig?.blurEffect && (
             <div className="form-group">
-              <label>模糊强度: {config.backgroundConfig?.blurStrength || 5}px</label>
+              <label>模糊强度:</label>
               <input
                 type="range"
-                min="1"
+                min="0"
                 max="20"
                 value={config.backgroundConfig?.blurStrength || 5}
                 onChange={(e) => setConfig({
-                  ...config, 
-                  backgroundConfig: {...config.backgroundConfig, blurStrength: parseInt(e.target.value)}
+                  ...config,
+                  backgroundConfig: {
+                    position: config.backgroundConfig?.position || 'center',
+                    size: config.backgroundConfig?.size || 'cover',
+                    repeat: config.backgroundConfig?.repeat || 'no-repeat',
+                    blurEffect: config.backgroundConfig?.blurEffect || false,
+                    blurStrength: parseInt(e.target.value)
+                  }
                 })}
               />
+              <span>{config.backgroundConfig?.blurStrength || 5}px</span>
             </div>
           )}
         </div>
 
         <div className="form-section">
-=======
->>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
           <h3>作者信息</h3>
           <div className="form-group">
             <label>作者名称:</label>
             <input
               value={config.author.name}
               onChange={(e) => setConfig({
-                ...config, 
+                ...config,
                 author: {...config.author, name: e.target.value}
               })}
             />
@@ -330,7 +369,7 @@ export default function Dashboard() {
             <input
               value={config.author.avatar}
               onChange={(e) => setConfig({
-                ...config, 
+                ...config,
                 author: {...config.author, avatar: e.target.value}
               })}
             />
@@ -340,7 +379,7 @@ export default function Dashboard() {
             <textarea
               value={config.author.bio}
               onChange={(e) => setConfig({
-                ...config, 
+                ...config,
                 author: {...config.author, bio: e.target.value}
               })}
               rows={3}
@@ -352,59 +391,41 @@ export default function Dashboard() {
           <h3>导航菜单</h3>
           {config.navigation.map((item, index) => (
             <div key={index} className="nav-item">
-<<<<<<< HEAD
               <div className="nav-item-header">
                 <span>导航项 #{index + 1}</span>
                 <button 
                   type="button" 
                   className="remove-btn"
-                  onClick={() => {
-                    const newNav = config.navigation.filter((_, i) => i !== index)
-                    setConfig({...config, navigation: newNav})
-                  }}
+                  onClick={() => handleRemoveNavItem(index)}
                 >
                   删除
                 </button>
               </div>
-=======
->>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
-              <div className="form-group">
-                <label>名称:</label>
-                <input
-                  value={item.name}
-                  onChange={(e) => {
-                    const newNav = [...config.navigation]
-                    newNav[index].name = e.target.value
-                    setConfig({...config, navigation: newNav})
-                  }}
-                />
-              </div>
-              <div className="form-group">
-                <label>URL:</label>
-                <input
-                  value={item.url}
-                  onChange={(e) => {
-                    const newNav = [...config.navigation]
-                    newNav[index].url = e.target.value
-                    setConfig({...config, navigation: newNav})
-                  }}
-                />
+              <div className="nav-item-form">
+                <div className="form-group">
+                  <label>名称:</label>
+                  <input
+                    value={item.name}
+                    onChange={(e) => handleNavItemChange(index, 'name', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>链接:</label>
+                  <input
+                    value={item.url}
+                    onChange={(e) => handleNavItemChange(index, 'url', e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           ))}
-<<<<<<< HEAD
           <button 
             type="button" 
             className="add-btn"
-            onClick={() => {
-              const newNav = [...config.navigation, {name: '新链接', url: 'https://'}]}
-              setConfig({...config, navigation: newNav})
-            }}
+            onClick={handleAddNavItem}
           >
             + 添加导航项
           </button>
-=======
->>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
         </div>
 
         <button type="submit" className="save-btn">保存配置</button>
@@ -412,9 +433,9 @@ export default function Dashboard() {
 
       <style jsx>{`
         .dashboard-container {
-          padding: 2rem;
           max-width: 800px;
           margin: 0 auto;
+          padding: 2rem;
         }
 
         .dashboard-header {
@@ -422,6 +443,8 @@ export default function Dashboard() {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 2rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid #eee;
         }
 
         .logout-btn {
@@ -431,6 +454,10 @@ export default function Dashboard() {
           border: none;
           border-radius: 4px;
           cursor: pointer;
+        }
+
+        .logout-btn:hover {
+          background: #c82333;
         }
 
         .config-form {
@@ -446,6 +473,11 @@ export default function Dashboard() {
           border-bottom: 1px solid #eee;
         }
 
+        .form-section:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+        }
+
         .form-group {
           margin-bottom: 1rem;
         }
@@ -456,20 +488,23 @@ export default function Dashboard() {
           font-weight: 500;
         }
 
-        input, textarea {
+        input, select, textarea {
           width: 100%;
           padding: 0.5rem;
           border: 1px solid #ddd;
           border-radius: 4px;
+          font-size: 1rem;
+        }
+
+        textarea {
+          resize: vertical;
         }
 
         .nav-item {
           background: #f8f9fa;
           padding: 1rem;
-          margin-bottom: 1rem;
           border-radius: 4px;
-<<<<<<< HEAD
-          border: 1px solid #dee2e6;
+          margin-bottom: 1rem;
         }
 
         .nav-item-header {
@@ -477,8 +512,6 @@ export default function Dashboard() {
           justify-content: space-between;
           align-items: center;
           margin-bottom: 1rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #dee2e6;
         }
 
         .remove-btn {
@@ -495,34 +528,39 @@ export default function Dashboard() {
           background: #c82333;
         }
 
+        .nav-item-form {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
         .add-btn {
-          padding: 0.5rem 1rem;
+          padding: 0.75rem 1rem;
           background: #28a745;
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
-          margin-top: 1rem;
+          font-size: 1rem;
         }
 
         .add-btn:hover {
           background: #218838;
-=======
->>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
         }
 
         .save-btn {
           padding: 1rem 2rem;
-          background: #28a745;
+          background: #0070f3;
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
           font-size: 1.1rem;
+          width: 100%;
         }
 
         .save-btn:hover {
-          background: #218838;
+          background: #0056b3;
         }
       `}</style>
     </div>
