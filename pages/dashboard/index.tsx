@@ -38,17 +38,27 @@ export default function Dashboard() {
       .catch(console.error)
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    const adminUsername = process.env.ADMIN_USERNAME
-    const adminPassword = process.env.ADMIN_PASSWORD
-    
-    if (username === adminUsername && password === adminPassword) {
-      setIsAuthenticated(true)
-      localStorage.setItem('isAuthenticated', 'true')
-    } else {
-      alert('用户名或密码错误')
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      })
+      
+      if (response.ok) {
+        setIsAuthenticated(true)
+        localStorage.setItem('isAuthenticated', 'true')
+      } else {
+        alert('用户名或密码错误')
+      }
+    } catch (error) {
+      console.error('登录错误:', error)
+      alert('登录失败，请重试')
     }
   }
 
