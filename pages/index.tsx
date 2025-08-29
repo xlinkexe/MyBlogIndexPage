@@ -45,6 +45,7 @@ export default function Home() {
       visitorCount++
     }
     setVisitors(visitorCount)
+    
     const loadConfigAndBackground = async () => {
       try {
         const configResponse = await fetch('/api/config')
@@ -93,6 +94,11 @@ export default function Home() {
     }
     
     loadConfigAndBackground()
+    
+    // 设置定时器，每30秒检查一次配置更新
+    const interval = setInterval(loadConfigAndBackground, 30000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   if (!config) {
