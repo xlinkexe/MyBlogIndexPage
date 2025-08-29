@@ -235,7 +235,6 @@ export default function Dashboard() {
         </div>
 
         <div className="form-section">
-<<<<<<< HEAD
           <h3>背景图片设置</h3>
           <div className="form-group">
             <label>背景位置:</label>
