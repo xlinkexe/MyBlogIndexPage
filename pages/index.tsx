@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 
+let viewCount = 0
+let visitorCount = 0
+const VISITOR_KEY = 'blog_visitor_id'
+
 interface Config {
   siteName: string
   logo: string
@@ -18,8 +22,22 @@ interface Config {
 
 export default function Home() {
   const [config, setConfig] = useState<Config | null>(null)
+  const [views, setViews] = useState(0)
+  const [visitors, setVisitors] = useState(0)
 
   useEffect(() => {
+    // 浏览量统计
+    viewCount++
+    setViews(viewCount)
+    
+    // 访客统计
+    let visitorId = localStorage.getItem(VISITOR_KEY)
+    if (!visitorId) {
+      visitorId = Math.random().toString(36).substring(2) + Date.now().toString(36)
+      localStorage.setItem(VISITOR_KEY, visitorId)
+      visitorCount++
+    }
+    setVisitors(visitorCount)
 <<<<<<< HEAD
     const loadConfigAndBackground = async () => {
       try {
@@ -261,6 +279,19 @@ export default function Home() {
           font-size: 1.1rem;
           color: #666;
           line-height: 1.6;
+        }
+
+        .footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          text-align: center;
+          padding: 1rem;
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(10px);
+          font-size: 0.9rem;
+          color: #666;
         }
       `}</style>
     </>
