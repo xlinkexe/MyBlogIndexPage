@@ -20,10 +20,34 @@ export default function Home() {
   const [config, setConfig] = useState<Config | null>(null)
 
   useEffect(() => {
-    fetch('/config.json')
-      .then(res => res.json())
+    fetch('/api/config')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to load config')
+        }
+        return res.json()
+      })
       .then(setConfig)
-      .catch(console.error)
+      .catch(error => {
+        console.error('Config load error:', error)
+        // 使用默认配置作为后备
+        setConfig({
+          siteName: '我的博客',
+          logo: '/logo.png',
+          backgroundImage: '/background.jpg',
+          author: {
+            name: '博客作者',
+            avatar: '/avatar.jpg',
+            bio: '这是我的个人博客，分享技术文章和生活感悟'
+          },
+          navigation: [
+            {name: '首页', url: '/'},
+            {name: 'GitHub', url: 'https://github.com'},
+            {name: '知乎', url: 'https://zhihu.com'},
+            {name: '微博', url: 'https://weibo.com'}
+          ]
+        })
+      })
   }, [])
 
   if (!config) {
