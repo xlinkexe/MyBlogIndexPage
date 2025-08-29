@@ -7,9 +7,5 @@
     "pages/api/**/*.js": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "ADMIN_USERNAME": "@admin_username",
-    "ADMIN_PASSWORD": "@admin_password"
   }
 }
