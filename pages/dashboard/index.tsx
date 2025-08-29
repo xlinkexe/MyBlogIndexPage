@@ -235,6 +235,7 @@ export default function Dashboard() {
         </div>
 
         <div className="form-section">
+<<<<<<< HEAD
           <h3>背景图片设置</h3>
           <div className="form-group">
             <label>背景位置:</label>
@@ -312,6 +313,8 @@ export default function Dashboard() {
         </div>
 
         <div className="form-section">
+=======
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
           <h3>作者信息</h3>
           <div className="form-group">
             <label>作者名称:</label>
@@ -350,6 +353,7 @@ export default function Dashboard() {
           <h3>导航菜单</h3>
           {config.navigation.map((item, index) => (
             <div key={index} className="nav-item">
+<<<<<<< HEAD
               <div className="nav-item-header">
                 <span>导航项 #{index + 1}</span>
                 <button 
@@ -363,6 +367,8 @@ export default function Dashboard() {
                   删除
                 </button>
               </div>
+=======
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
               <div className="form-group">
                 <label>名称:</label>
                 <input
@@ -387,6 +393,7 @@ export default function Dashboard() {
               </div>
             </div>
           ))}
+<<<<<<< HEAD
           <button 
             type="button" 
             className="add-btn"
@@ -397,6 +404,8 @@ export default function Dashboard() {
           >
             + 添加导航项
           </button>
+=======
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
         </div>
 
         <button type="submit" className="save-btn">保存配置</button>
@@ -460,6 +469,7 @@ export default function Dashboard() {
           padding: 1rem;
           margin-bottom: 1rem;
           border-radius: 4px;
+<<<<<<< HEAD
           border: 1px solid #dee2e6;
         }
 
@@ -498,6 +508,8 @@ export default function Dashboard() {
 
         .add-btn:hover {
           background: #218838;
+=======
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
         }
 
         .save-btn {

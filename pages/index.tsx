@@ -20,6 +20,7 @@ export default function Home() {
   const [config, setConfig] = useState<Config | null>(null)
 
   useEffect(() => {
+<<<<<<< HEAD
     const loadConfigAndBackground = async () => {
       try {
         const configResponse = await fetch('/api/config')
@@ -39,11 +40,23 @@ export default function Home() {
         
         setConfig(configData)
       } catch (error) {
+=======
+    fetch('/api/config')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to load config')
+        }
+        return res.json()
+      })
+      .then(setConfig)
+      .catch(error => {
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
         console.error('Config load error:', error)
         // 使用默认配置作为后备
         setConfig({
           siteName: '我的博客',
           logo: '/logo.png',
+<<<<<<< HEAD
           backgroundImage: '',
           backgroundConfig: {
             position: 'center',
@@ -52,6 +65,9 @@ export default function Home() {
             blurEffect: false,
             blurStrength: 5
           },
+=======
+          backgroundImage: '/background.jpg',
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
           author: {
             name: '博客作者',
             avatar: '/avatar.jpg',
@@ -64,10 +80,14 @@ export default function Home() {
             {name: '微博', url: 'https://weibo.com'}
           ]
         })
+<<<<<<< HEAD
       }
     }
     
     loadConfigAndBackground()
+=======
+      })
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
   }, [])
 
   if (!config) {
@@ -84,6 +104,7 @@ export default function Home() {
       <div 
         className="container" 
         style={{ 
+<<<<<<< HEAD
           backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : 'none',
           backgroundSize: config.backgroundConfig?.size || 'cover',
           backgroundPosition: config.backgroundConfig?.position || 'center',
@@ -106,6 +127,14 @@ export default function Home() {
             }}
           />
         )}
+=======
+          backgroundImage: `url(${config.backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          minHeight: '100vh'
+        }}
+      >
+>>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
         <nav className="navbar">
           <div className="nav-brand">
             <img src={config.logo} alt="Logo" className="logo" />
