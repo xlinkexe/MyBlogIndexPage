@@ -186,6 +186,10 @@ export default function Home() {
         </main>
       </div>
 
+      <footer className="footer">
+        总浏览量: {views} | 访客数: {visitors}
+      </footer>
+
       <style jsx>{`
         .loading {
           display: flex;

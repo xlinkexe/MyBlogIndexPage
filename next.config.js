@@ -2,7 +2,6 @@
 const nextConfig = {
   trailingSlash: true,
   images: {
-<<<<<<< HEAD
     unoptimized: true,
     domains: ['tc.artemisia.icu'],
     remotePatterns: [
@@ -12,10 +11,7 @@ const nextConfig = {
         port: '',
         pathname: '/file/**',
       },
-    ],
-=======
-    unoptimized: true
->>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
+    ]
   }
 }
 
