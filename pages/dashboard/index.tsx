@@ -99,7 +99,8 @@ export default function Dashboard() {
       })
       
       if (response.ok) {
-        alert('配置保存成功')
+        alert('配置保存成功！页面将刷新以应用更改')
+        window.location.reload()
       } else {
         alert('配置保存失败')
       }
