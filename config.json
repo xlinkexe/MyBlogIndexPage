@@ -2,7 +2,7 @@
   "siteName": "我的博客",
 <<<<<<< HEAD
   "logo": "https://tc.artemisia.icu/file/3RUdVom2.png",
-  "backgroundImage": "https://tc.artemisia.icu/file/background.jpg",
+  "backgroundImage": "https://tc.artemisia.icu/file/yTDz2k8d.png",
   "backgroundConfig": {
     "position": "center",
     "size": "cover",
@@ -12,13 +12,13 @@
   },
   "author": {
     "name": "博客作者",
-    "avatar": "https://tc.artemisia.icu/file/avatar.jpg",
+    "avatar": "https://tc.artemisia.icu/file/3RUdVom2.png",
 =======
   "logo": "/logo.png",
-  "backgroundImage": "/background.jpg",
+  "backgroundImage": "https://tc.artemisia.icu/file/yTDz2k8d.png",
   "author": {
     "name": "博客作者",
-    "avatar": "/avatar.jpg",
+    "avatar": "https://tc.artemisia.icu/file/3RUdVom2.png",
 >>>>>>> 2fcfa30f36494be9a432437c7fca25e2b110ebb8
     "bio": "这是我的个人博客，分享技术文章和生活感悟"
   },
